@@ -41,15 +41,19 @@
         };
         
         this._successHandler = function () {
-            console.log("Frmifrm Default Success Handler");
+            this.form().triggerHandler("success", arguments);
         };
         this._failureHandler = function () {
-            console.log("Frmifrm Default Failure Handler");
+            this.form().triggerHandler("failure", arguments);
+        };
+        this._completeHandler = function () {
+            this.form().triggerHandler("complete", arguments);
         };
 
-        this.then = function (onSuccess, onFailure) {
+        this.then = function (onSuccess, onFailure, onComplete) {
             if (onSuccess) this._successHandler = onSuccess;
             if (onFailure) this._failureHandler = onFailure;
+            if (onComplete) this._completeHandler = onComplete;
             return this;
         };
         instances[iframeName] = this;
@@ -60,13 +64,19 @@
     };
     Frmifrm.success = function () {
         var fif = global.parent.Frmifrm.get(global.name);
-        var handler = fif._successHandler;
-        return handler.apply(fif, arguments);
+        var handler = fif._successHandler,
+            completeHandler = fif._completeHandler;
+        result = handler.apply(fif, arguments);
+        completeHandler.apply(fif, arguments);
+        return result;
     };
     Frmifrm.failure = function () {
         var fif = global.parent.Frmifrm.get(global.name);
-        var handler = fif._failureHandler;
-        return handler.apply(fif, arguments);
+        var handler = fif._failureHandler,
+            completeHandler = fif._completeHandler;
+        result = handler.apply(fif, arguments);
+        completeHandler.apply(fif, arguments);
+        return result;
     };
     
     var init = function () {
@@ -75,10 +85,12 @@
                 var form = $(this),
                     fif = new Frmifrm(form),
                     onSuccess = form.attr("onsuccess"),
-                    onFailure = form.attr("onfailure");
+                    onFailure = form.attr("onfailure"),
+                    onComplete = form.attr("oncomplete");
                 fif.then(
                     onSuccess ? eval("(" + onSuccess + ")") : null,
-                    onFailure ? eval("(" + onFailure + ")") : null
+                    onFailure ? eval("(" + onFailure + ")") : null,
+                    onComplete ? eval("(" + onComplete + ")") : null
                 );
                 form.data("frmifrm", fif.name());
             });
