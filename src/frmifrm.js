@@ -29,7 +29,7 @@
             iframeName = "_frmifrm_" + formNameId++;
         }
         
-        if (iframe === null || iframe.length === 0) {
+        if (!iframe || iframe.length === 0) {
             iframe = $("<iframe></iframe>").attr("name", iframeName).css({"display": "none"});
         }
 
