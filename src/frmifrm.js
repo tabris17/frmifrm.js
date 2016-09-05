@@ -6,7 +6,7 @@
         formNameId = 1,
         instances = {};
         
-    var Frmifrm = function (form) {
+    var Frmifrm = function (form, name) {
         switch($.type(form)) {
         case "string":
             form = $("#" + form);
@@ -20,8 +20,18 @@
             throw "Unexpected Argument";
         }
 
-        var iframeName = "_frmifrm_" + formNameId++,
+        var iframeName, iframe;
+        
+        if (name) {
+            iframeName = "_frmifrm_" + name;
+            iframe = $('iframe[name="' + iframeName + '"]');
+        } else {
+            iframeName = "_frmifrm_" + formNameId++;
+        }
+        
+        if (iframe === null || iframe.length === 0) {
             iframe = $("<iframe></iframe>").attr("name", iframeName).css({"display": "none"});
+        }
 
         form.attr("target", iframeName);
         $(document.body).append(iframe);
